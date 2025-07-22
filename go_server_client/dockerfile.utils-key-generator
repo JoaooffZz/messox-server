@@ -1,0 +1,29 @@
+# ---- Etapa de Build ----
+FROM golang:1.23.9 AS builder
+
+# Define diretório de trabalho
+WORKDIR /app
+
+# Copia os arquivos do módulo
+COPY utils/ ./utils
+
+# Entra no diretório com o go.mod
+WORKDIR /app/utils
+
+# Baixa as dependências
+RUN go mod download
+
+# Compila o binário
+RUN mkdir -p /app/bin
+RUN go build -o /app/bin/utils .
+
+# ---- Etapa Final ----
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/bin/utils .
+
+RUN chmod +x ./utils
+
+CMD ["./utils"]
