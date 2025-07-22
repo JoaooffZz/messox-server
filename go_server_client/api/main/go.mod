@@ -2,7 +2,12 @@ module api/main
 
 go 1.22.1
 
-require github.com/gin-gonic/gin v1.10.1
+replace ws/models => ../../ws/models
+
+require (
+	github.com/gin-gonic/gin v1.10.1
+	ws/models v0.0.0-00010101000000-000000000000
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
