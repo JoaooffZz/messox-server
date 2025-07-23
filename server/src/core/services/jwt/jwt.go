@@ -7,12 +7,12 @@ import (
 )
 
 type ServiceJWT struct {
-	keyPem []byte
+	KeyPem []byte
 }
 
-func (s *ServiceJWT) build(userID string) (string, error) {
+func (s *ServiceJWT) Build(userID string) (string, error) {
 
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(s.keyPem)
+	key, err := jwt.ParseRSAPrivateKeyFromPEM(s.KeyPem)
 	if err != nil {
 		return "", fmt.Errorf("build jwt: %v", err)
 	}
@@ -28,8 +28,8 @@ func (s *ServiceJWT) build(userID string) (string, error) {
 	return sigJwy, nil
 }
 
-func (s *ServiceJWT) verify(tokenStr string) (bool, error) {
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(s.keyPem)
+func (s *ServiceJWT) Verify(tokenStr string) (bool, error) {
+	key, err := jwt.ParseRSAPrivateKeyFromPEM(s.KeyPem)
 	if err != nil {
 		return false, fmt.Errorf("verify jwt: erro ao carregar chave privada: %v", err)
 	}

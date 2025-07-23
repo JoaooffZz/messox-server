@@ -1,4 +1,4 @@
-module service_jwt
+module services/jwt
 
 go 1.22.1
 
