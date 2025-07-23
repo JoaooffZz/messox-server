@@ -5,25 +5,25 @@ FROM golang:1.23.9 AS builder
 WORKDIR /app
 
 # Copia os arquivos do módulo
-COPY utils/ ./utils
+COPY test/ ./test
 
 # Entra no diretório com o go.mod
-WORKDIR /app/utils
+WORKDIR /app/test
 
 # Baixa as dependências
 RUN go mod download
 
 # Compila o binário
 RUN mkdir -p /app/bin
-RUN go build -o /app/bin/utils .
+RUN go build -o /app/bin/test .
 
 # ---- Etapa Final ----
 FROM debian:bookworm-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/bin/utils .
+COPY --from=builder /app/bin/test .
 
-RUN chmod +x ./utils
+RUN chmod +x ./test
 
-CMD ["./utils"]
+CMD ["./test"]

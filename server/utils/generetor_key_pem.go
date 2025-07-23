@@ -9,11 +9,11 @@ import (
 	"os"
 )
 
-func GenerateKeyPem() {
+func GenerateKeyPem(path string) error {
     // Gera uma chave RSA de 2048 bits
     privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
     if err != nil {
-        panic(fmt.Sprintf("Erro ao gerar chave: %v", err))
+        return fmt.Errorf("erro genereta key: %v", err)
     }
 
     // Codifica a chave em formato DER (PKCS#1)
@@ -26,15 +26,16 @@ func GenerateKeyPem() {
     }
 
     // Cria o arquivo e escreve o conteúdo PEM
-    file, err := os.Create("private_key.pem")
+    file, err := os.Create(path)
     if err != nil {
-        panic(fmt.Sprintf("Erro ao criar arquivo: %v", err))
+        return fmt.Errorf("error creating file: %v", err)
     }
     defer file.Close()
 
     if err := pem.Encode(file, pemBlock); err != nil {
-        panic(fmt.Sprintf("Erro ao escrever chave no arquivo: %v", err))
+        return fmt.Errorf("error writing key to file: %v", err)
     }
 
-    fmt.Println("✅ Chave RSA salva em 'private_key.pem'")
+    fmt.Println("✅ Key RSA save in 'private_key.pem'")
+    return nil
 }
