@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Websocket(eng *gin.Engine) {
+func Run(eng *gin.Engine) {
 	eng.GET("/ws", func(ctx *gin.Context) {
 		var handler Handler
 		if err := ctx.ShouldBindJSON(&handler); err != nil {
@@ -40,6 +40,15 @@ func Websocket(eng *gin.Engine) {
 			)
 			return
 		}
+
+		userID, err := service.GetUserIDFromJWT()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, 
+				gin.H{"internal": fmt.Sprintf("failed: %v", err)},
+			)
+			return
+		}
+		
 
 		// chamar servico de websocket aqui
 

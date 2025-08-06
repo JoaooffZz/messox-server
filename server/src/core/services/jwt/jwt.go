@@ -8,6 +8,7 @@ import (
 
 type ServiceJWT struct {
 	KeyPem []byte
+	token *jwt.Token
 }
 
 func (s *ServiceJWT) Build(userID string) (string, error) {
@@ -21,11 +22,11 @@ func (s *ServiceJWT) Build(userID string) (string, error) {
 		"user_id": userID,
 	})
 
-	sigJwy, err := claim.SignedString(key)
+	sigJwt, err := claim.SignedString(key)
 	if err != nil {
 		return "", fmt.Errorf("build jwt: %v", err)
 	}
-	return sigJwy, nil
+	return sigJwt, nil
 }
 
 func (s *ServiceJWT) Verify(tokenStr string) (bool, error) {
@@ -34,7 +35,7 @@ func (s *ServiceJWT) Verify(tokenStr string) (bool, error) {
 		return false, fmt.Errorf("verify jwt: erro ao carregar chave privada: %v", err)
 	}
 
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+	s.token, err = jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("verify jwt: invalid sign method: %v", token.Header["alg"])
@@ -45,7 +46,23 @@ func (s *ServiceJWT) Verify(tokenStr string) (bool, error) {
 		return false, fmt.Errorf("verify jwt: %v", err)
 	}
 
-	return token.Valid, nil
+	return s.token.Valid, nil
 }
 
+func (s *ServiceJWT) GetUserIDFromJWT() (string, error) {
+	if s.token == nil {
+		return "", fmt.Errorf("get user id: token is nil")
+	}
 
+	claims, ok := s.token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("get user id: claims are not of type jwt.MapClaims")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return "", fmt.Errorf("get user id: user_id not found in claims")
+	}
+
+	return userID, nil
+}

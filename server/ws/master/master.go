@@ -2,9 +2,11 @@ package master
 
 import (
 	"net/http"
-	connWS "ws/connection"
-	model "ws/models"
+	connWs "ws/connection"
 
+	// model "ws/models"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -14,24 +16,32 @@ var upgrader = websocket.Upgrader{
 }
 
 type ServerWS struct {
-	hub *connWS.Hub
-	w http.ResponseWriter
+	id string
+	// client *connWS.Client
+	hub *connWs.Hub
+	w  http.ResponseWriter
 	r *http.Request
-	msg model.Message
+	// msg model.Message
 }
 
-func (ws *ServerWS)serveWs() {
-	conn, err := upgrader.Upgrade(ws.w, ws.r, nil)
+func (s *ServerWS)Run(ctx *gin.Context) {
+	conn, err := upgrader.Upgrade(s.w, s.r, nil)
+
 	if err != nil {
-		// log.Println(err)
+		ctx.JSON(http.StatusInternalServerError, 
+			gin.H{"error ws":"error up-conn-ws : %v", err},
+		)
 		return
 	}
-	client := &connWS.Client{
-		Id: ws.msg.FromID,
-		Hub: ws.hub, 
-		Conn: conn, 
-		Send: make(chan []byte, 256)}
-	client.Hub.Register <- client
+
+	client := connWs.NewClient(conn, s.hub, s.id)
+	// go client.
+	// client := &connWS.Client{
+	// 	Id: ws.msg.FromID,
+	// 	Hub: ws.hub, 
+	// 	Conn: conn, 
+	// 	Send: make(chan []byte, 256)}
+	// s.client.Hub.Register <- s.client
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
