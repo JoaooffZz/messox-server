@@ -16,35 +16,26 @@ var upgrader = websocket.Upgrader{
 }
 
 type ServerWS struct {
-	id string
-	// client *connWS.Client
-	hub *connWs.Hub
-	w  http.ResponseWriter
-	r *http.Request
-	// msg model.Message
+	Id string
+	Hub *connWs.Hub
+	W  http.ResponseWriter
+	R *http.Request
 }
 
 func (s *ServerWS)Run(ctx *gin.Context) {
-	conn, err := upgrader.Upgrade(s.w, s.r, nil)
+	conn, err := upgrader.Upgrade(s.W, s.R, nil)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, 
-			gin.H{"error ws":"error up-conn-ws : %v", err},
+			gin.H{"error ws":"error up-conn-ws"},
 		)
 		return
 	}
+	ctx.JSON(http.StatusSwitchingProtocols, nil)
 
-	client := connWs.NewClient(conn, s.hub, s.id)
-	// go client.
-	// client := &connWS.Client{
-	// 	Id: ws.msg.FromID,
-	// 	Hub: ws.hub, 
-	// 	Conn: conn, 
-	// 	Send: make(chan []byte, 256)}
-	// s.client.Hub.Register <- s.client
+	client := connWs.NewClient(conn, s.Hub, s.Id)
+	s.Hub.Register <- client
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	// go client.writePump()
-	// go client.readPump()
+	go client.ReadPump()
+	go client.WritePump()
 }

@@ -39,14 +39,18 @@ func (h *Hub) Run() {
 					close(client.Send)
 				}
 
-			case message := <-h.Broadcast:
-				to, ok := h.clients[message.To]
+			case msg := <-h.Broadcast:
+				toClient, ok := h.clients[msg.To]
 				if !ok {
 				    // chama a goroutine para salvar a mensagem no
 					// banco de dados de notificação.
 				}
-
-				// chama to.WritePump
+				select {
+					case toClient.Send <- msg:
+					default:
+						close(toClient.Send)
+						delete(h.clients, toClient.Id)
+				}
 		}
 	}
 }
