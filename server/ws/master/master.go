@@ -13,6 +13,9 @@ import (
 var upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true // aceita qualquer origem
+	},
 }
 
 type ServerWS struct {
@@ -24,14 +27,18 @@ type ServerWS struct {
 
 func (s *ServerWS)Run(ctx *gin.Context) {
 	conn, err := upgrader.Upgrade(s.W, s.R, nil)
-
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, 
-			gin.H{"error ws":"error up-conn-ws"},
-		)
 		return
 	}
-	ctx.JSON(http.StatusSwitchingProtocols, nil)
+
+	// if err != nil {
+	// 	ctx.Writer.WriteHeader(http.StatusInternalServerError)
+	// 	// ctx.JSON(http.StatusInternalServerError, 
+	// 	// 	gin.H{"error ws":"error up-conn-ws"},
+	// 	// )
+	// 	return
+	// }
+	// ctx.JSON(http.StatusSwitchingProtocols, nil)
 
 	client := connWs.NewClient(conn, s.Hub, s.Id)
 	s.Hub.Register <- client

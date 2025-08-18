@@ -6,10 +6,16 @@ replace services/jwt => ../../../src/core/services/jwt
 
 replace utils => ../../../utils
 
+replace ws/connection => ../../../ws/connection
+
+replace ws/models => ../../../ws/models
+
+replace ws/master => ../../../ws/master
+
 require (
 	github.com/gin-gonic/gin v1.10.1
-	services/jwt v0.0.0-00010101000000-000000000000
-	utils v0.0.0-00010101000000-000000000000
+	ws/connection v0.0.0-00010101000000-000000000000
+	ws/master v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -23,7 +29,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.3 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -40,4 +46,5 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	ws/models v0.0.0-00010101000000-000000000000 // indirect
 )

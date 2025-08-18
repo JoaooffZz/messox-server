@@ -4,6 +4,7 @@ import (
 	// modelsWS "ws/models"
 
 	routeWS "routes/web_socket"
+	connWS "ws/connection"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,7 +12,9 @@ import (
 func main() {
 	engGIN := gin.Default()
 
-	routeWS.Run(engGIN)
+    hub := connWS.NewHub()
+	go hub.Run()
+	routeWS.Run(engGIN, hub)
 
 	// engGIN.GET("/ws", func(ctx *gin.Context) {
 	// 	var handler modelsWS.Handler

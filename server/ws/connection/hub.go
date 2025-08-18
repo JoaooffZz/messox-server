@@ -42,6 +42,7 @@ func (h *Hub) Run() {
 			case msg := <-h.Broadcast:
 				toClient, ok := h.clients[msg.To]
 				if !ok {
+					return
 				    // chama a goroutine para salvar a mensagem no
 					// banco de dados de notificação.
 				}
