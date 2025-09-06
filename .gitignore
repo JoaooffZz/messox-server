@@ -1,2 +1,9 @@
-#readmes private
-web-socket.md
+# readmes private
+/todo/
+
+# tests
+/test/
+
+# docker tests
+.dockerfile.test
+

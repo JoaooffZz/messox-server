@@ -3,6 +3,7 @@ package connection
 import (
 	"encoding/json"
 	"time"
+
 	m "ws/models"
 
 	"github.com/gorilla/websocket"
@@ -22,12 +23,15 @@ const (
 type Client struct {
    // identificador
    Id string
+
    // A conexão web socket
    Conn *websocket.Conn
+
    // Endereço de hub
    Hub *Hub
-   // canal de mensagem
-   Send chan *m.Message
+
+   // Canal de mensagem
+   Send chan []byte
 }
 
 func NewClient(conn *websocket.Conn, hub *Hub, id string) *Client {
@@ -35,7 +39,7 @@ func NewClient(conn *websocket.Conn, hub *Hub, id string) *Client {
       Id: id,
       Conn: conn,
       Hub: hub,
-      Send: make(chan *m.Message),
+      Send: make(chan []byte, 256),
    }
 }
 
@@ -58,24 +62,13 @@ func (c *Client)ReadPump() {
          return
       }
 
-      var msg m.Message
-      err = json.Unmarshal(message, &msg)
+      var event m.WsEvent
+      err = json.Unmarshal(message, &event)
       if err != nil {
          return
       }
-      c.Hub.Broadcast <- &msg
-      
-      // como fica o banco de dados?
-      // seria melhor só repassar a mensagem para o destino,
-      // o hub ja faz o cancelamento do registro dos cache-user-on
-      // e quando a mensagem for enviada, e só chamar uma goroutine
-      // que ira receber a mensagem e salvar no banco de dados
-      // tratando (conversa nova, conversa antiga)
-
-      // o usuario que receber a mensagem, o app devera tratala fazendo de uso
-      // do (db-local)
-
-
+      event.Sender = &c.Id
+      c.Hub.Broadcast <- &event
    }
 }
 
@@ -88,16 +81,14 @@ func (c *Client)WritePump() {
    }()
    for {
       select{        
-         case msg, ok := <- c.Send:
+         case send, ok := <- c.Send:
             if !ok {
                c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
                // caso msg nao esteja vazia
                // chama uma go routine para salvar message no db BoxMessage
                return
             }
-            // chama uma go routine para salvar a mensagem no banco de dados
-            msgBytes, _ := json.Marshal(msg)
-            c.Conn.WriteMessage(websocket.TextMessage, msgBytes)
+            c.Conn.WriteMessage(websocket.TextMessage, send)
          
          case <- ticker.C:
             c.Conn.SetWriteDeadline(time.Now().Add(writeWait))

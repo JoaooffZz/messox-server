@@ -1,8 +1,6 @@
 package models
 
 type Message struct {
-	Type string `json:"type"`
-	From string `json:"from"`
-	To string `json:"to"`
-	Content string `json:"content"`
+	Message string `json:"message"`
+	Date int64 `json:"date"`
 }
