@@ -1,23 +1,21 @@
-module api/main
+module routes/web_socket
 
 go 1.22.1
 
-replace routes/web_socket => ../routes/web_socket
+replace services/jwt => ../../../../src/core/services/jwt
 
-replace services/jwt => ../../src/core/services/jwt
+replace utils => ../../../../utils
 
-replace utils => ../../utils
+replace ws/connection => ../../../../ws/connection
 
-replace ws/connection => ../../ws/connection
+replace ws/models => ../../../../ws/models
 
-replace ws/models => ../../ws/models
-
-replace ws/master => ../../ws/master
+replace ws/master => ../../../../ws/master
 
 require (
 	github.com/gin-gonic/gin v1.10.1
-	routes/web_socket v0.0.0-00010101000000-000000000000
 	ws/connection v0.0.0-00010101000000-000000000000
+	ws/master v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -48,6 +46,5 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	ws/master v0.0.0-00010101000000-000000000000 // indirect
 	ws/models v0.0.0-00010101000000-000000000000 // indirect
 )
