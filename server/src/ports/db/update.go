@@ -1,6 +1,6 @@
 package db
 
 type UpdateDB interface{
-	UserProfile(profile string) error
-	UserBio(bio string) error
+	UpUserProfile(userID int, profile string) error
+	UpUserBio(userID int, bio string) error
 }

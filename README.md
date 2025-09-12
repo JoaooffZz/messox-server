@@ -6,7 +6,7 @@
 
 <p align="center">
   🛰️ Servidor modular para o <strong>messox-app</strong><br>
-  API REST • WebSocket • MongoDB
+  API REST • WebSocket • PostgreSQL
 </p>
 
 ---
@@ -24,9 +24,9 @@ Projetado com uma **arquitetura monolítica modular**, o foco principal do proje
 
 - **Linguagem:** Go (Golang)
 - **API REST:** [Gin](https://gin-gonic.com/)
-- **WebSocket:** Gorilla WebSocket
-- **Banco de Dados:** MongoDB [opcional]
-- **Arquitetura:** Monolítica com modularização
+- **WebSocket:** [Gorilla WebSocket] (https://gorilla.github.io/)
+- **Banco de Dados:** PostgreSQL
+- **Arquitetura:** Monolítica com modularização + Ports and Adapters
 
 ---
 
@@ -45,10 +45,7 @@ Projetado com uma **arquitetura monolítica modular**, o foco principal do proje
 
 - [ ] Documentação completa com exemplos
 - [ ] Módulo de canais ONE TO ONE
-- [ ] Integração com MongoDB
+- [ ] Integração com PostgreSQL
 - [ ] Rotas principais API
 
----
-
-## 📁 Estrutura
 

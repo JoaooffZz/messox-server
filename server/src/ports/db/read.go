@@ -1,8 +1,9 @@
 package db
 
 type ReadDB interface{
-	TotalUsers() (int, error)
-	Users(name string) ([]User, error)
-	SentRequests(userID int64) ([]User, error)
-	ReceivedRequests(userID int64) ([]User, error)
+	GetTotalUsers() (int, error)
+	GetUsers(name string) ([]ViewUser, error)
+	GetInboxMessages(addresseeID int) ([]InboxMessage, error)
+	GetSentRequests(senderID int) ([]ViewUser, error)
+	GetReceivedRequests(addresseeID int) ([]ViewUser, error)
 }
