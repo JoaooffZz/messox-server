@@ -6,4 +6,8 @@
 
 # docker tests
 .dockerfile.test
+.docker-compose.test.yml
+
+# host docker
+.docker-compose-host.yml
 

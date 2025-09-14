@@ -10,6 +10,7 @@ func (c *Create)NewUser(user m.User)(int, error){
 	    INSERT INTO %s
 		(name, password, profile, bio)
 		VALUES ($1, $2, $3, $4)
+		RETURNING id
 	`, tabelUsers)
 
 	tx, err := c.DB.Begin()

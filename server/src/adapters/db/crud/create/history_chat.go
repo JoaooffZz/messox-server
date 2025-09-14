@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (c *Create)NewHistoryChat(chat m.Chat) error {
+func (c *Create)NewHistoryChat(chat m.ChatData) error {
 	
 	query := fmt.Sprintf(`
 	    INSERT INTO %s

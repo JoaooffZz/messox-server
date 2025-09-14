@@ -3,6 +3,7 @@ package read
 import (
 	m "db/models"
 	"fmt"
+	"time"
 )
 
 func (r *Read)GetInboxMessages(addresseeID int) ([]m.InboxMessage, error){
@@ -24,10 +25,12 @@ func (r *Read)GetInboxMessages(addresseeID int) ([]m.InboxMessage, error){
 
 	for rows.Next() {
         var i m.InboxMessage
-		err := rows.Scan(&i.SenderID, &i.Message, &i.CreatedAt)
+		var createdAtStr string
+		err := rows.Scan(&i.SenderID, &i.Message, &createdAtStr)
 		if err != nil {
 			return nil, err
 		}
+		i.CreatedAt, _ = time.Parse("15:04:05", createdAtStr)
 		inboxs = append(inboxs, i)
     }
 

@@ -7,7 +7,7 @@ func (c *Create)NewContact(userID int, contactID int) error {
     query := fmt.Sprintf(`
 	    INSERT INTO %s
 		(user_id, contact_id)
-		VALUES ($1, $2)
+		VALUES ($1, $2), ($2, $1);
 	`, tabelContacts)
 
 	tx, err := c.DB.Begin()
@@ -20,12 +20,11 @@ func (c *Create)NewContact(userID int, contactID int) error {
 	if err != nil {
 		return err
 	}
-
+	
 	err = tx.Commit()
 	if err != nil {
 		return err
 	}
 
 	return nil
-	
 }

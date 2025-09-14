@@ -7,12 +7,12 @@ import (
 
 func (r *Read)GetReceivedRequests(addresseeID int) ([]m.ViewUser, error){
 	query := fmt.Sprintf(`
-	    SELECT *,
-		    user.name AS name, 
-		    user.profile AS profile,
-		    user.bio AS bio
-	    FROM %s inbox
-		JOIN users user ON inbox.sender_id = user.id
+		SELECT
+			u.name AS name, 
+			u.profile AS profile,
+			u.bio AS bio
+		FROM %s inbox
+		JOIN users u ON inbox.sender_id = u.id
 		WHERE inbox.addressee_id = $1;
 	`, tabelInboxRequests)
 

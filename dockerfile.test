@@ -1,19 +1,19 @@
 # ---- Etapa de Build ----
-FROM golang:1.23.9 AS builder
+FROM golang:1.24.0 AS builder
 
-# Define diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos do módulo
+# Copia toda a pasta `test` e a pasta `server/src`
 COPY test/ ./test
+COPY server/src/ ./server/src
 
-# Entra no diretório com o go.mod
-WORKDIR /app/test
+# Define o diretório onde está o go.mod e o main.go
+WORKDIR /app/test/cmd
 
 # Baixa as dependências
 RUN go mod download
 
-# Compila o binário
+# Cria a pasta bin e compila o binário
 RUN mkdir -p /app/bin
 RUN go build -o /app/bin/test .
 
@@ -22,8 +22,11 @@ FROM debian:bookworm-slim
 
 WORKDIR /app
 
+# Copia o binário gerado
 COPY --from=builder /app/bin/test .
 
+# Garante permissão de execução
 RUN chmod +x ./test
 
+# Comando de inicialização
 CMD ["./test"]

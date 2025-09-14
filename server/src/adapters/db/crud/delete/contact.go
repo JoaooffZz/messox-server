@@ -7,8 +7,8 @@ import (
 func (d *Delete)DeleteContact(userID int, contactID int) error {
 	query := fmt.Sprintf(`
 	    DELETE FROM %s
-		WHERE user_id = $1
-		AND contact_id = $2;
+		WHERE (user_id = $1 AND contact_id = $2)
+            OR (user_id = $2 AND contact_id = $1);
 	`, tabelContacts)
 
 	res, err := d.DB.Exec(query, userID, contactID)

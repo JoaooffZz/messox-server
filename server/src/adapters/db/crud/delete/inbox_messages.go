@@ -4,7 +4,7 @@ import "fmt"
 
 func (d *Delete)DeleteInboxMessages(addresseeID int) error {
 	query := fmt.Sprintf(`
-	    DELETE ALL FROM %s
+	    DELETE FROM %s
 		WHERE addressee_id = $1;
 	`, tabelInboxMessages)
 

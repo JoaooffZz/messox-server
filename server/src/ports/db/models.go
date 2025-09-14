@@ -23,8 +23,16 @@ type InboxMessage struct {
     CreatedAt   time.Time `db:"created_at" json:"created_at"`
 }
 
-type Chat struct {
+type ChatData struct {
     ChatID int64                  `db:"chat_id" json:"chat_id"`
     Date   time.Time              `db:"date" json:"date"`
-    Chat   map[string]interface{} `db:"chat" json:"chat"`
+    Chat   ChatJsonB `db:"chat" json:"chat"`
+}
+type ChatJsonB struct {
+    History []Chat `db:"history" json:"history"`
+}
+type Chat struct {
+    ID int `db:"id" json:"id"`
+    Message string `db:"message" json:"message"`
+    Time string `db:"time" json:"time"`
 }

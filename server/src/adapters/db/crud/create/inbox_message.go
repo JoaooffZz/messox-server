@@ -18,7 +18,7 @@ func (c *Create)NewInboxMessage(inbox m.InboxMessage) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, inbox.SenderID, inbox.AdderessID, inbox.Message, inbox.CreatedAt)
+	_, err = tx.Exec(query, inbox.SenderID, inbox.AddresseeID, inbox.Message, inbox.CreatedAt)
 	if err != nil {
 		return err
 	}
