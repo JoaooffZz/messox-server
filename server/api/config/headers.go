@@ -1,7 +1,6 @@
 package config
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -9,23 +8,41 @@ import (
 
 const (
 	accept = "Accept"
-	acceptH = "application/json"
+	acceptType = "application/json"
 
 	auth = "Authorization"
 	authH = "Bearer "
 )
 
-func AuthHeader(c *gin.Context) (*string, bool) {
-	acceptHeader := c.GetHeader(accept)
-	if (acceptHeader != acceptH) {
-		c.JSON(http.StatusUnauthorized, gin.H{"accept": "malformed"})
-		return nil, false
+type HeaderContent struct {
+	Token *string
+	IsAuth bool
+	Header map[string]string
+}
+
+func AuthHeader(c *gin.Context) HeaderContent {
+	acceptReceived := c.GetHeader(accept)
+	if (acceptReceived != acceptType) {
+		return HeaderContent{
+			Token: nil,
+			IsAuth: false,
+			Header: map[string]string{"accept": "malformed"},
+		}
 	}
+
 	authHeader := c.GetHeader(auth)
 	if !strings.HasPrefix(authHeader, authH) {
-		c.JSON(http.StatusUnauthorized, gin.H{"authorization": "missing"})
-		return nil, false
+		return HeaderContent{
+			Token: nil,
+			IsAuth: false,
+			Header: map[string]string{"authorization": "missing"},
+		}
 	}
+
 	token := strings.TrimPrefix(authHeader, "Bearer ")
-	return &token, true
+	return HeaderContent{
+		Token: &token,
+		IsAuth: true,
+		Header: nil,
+	}
 }

@@ -1,8 +1,8 @@
 package read
 
 import (
-	m "db/models"
 	"fmt"
+	m "ports/db"
 )
 
 func (r *Read)GetUsers(name string) ([]m.ViewUser, error) {

@@ -1,8 +1,8 @@
 package read
 
 import (
-	m "db/models"
 	"fmt"
+	m "ports/db"
 	"time"
 )
 

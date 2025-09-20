@@ -1,7 +1,7 @@
 package db
 
 type CreateDB interface {
-	NewUser(user User) (int, error)
+	NewUser(name string, password string) (*User, error)
 	NewHistoryChat(chat ChatData) error
 	NewContact(userID int, contactID int) error 
 	NewInboxMessage(inbox InboxMessage) error

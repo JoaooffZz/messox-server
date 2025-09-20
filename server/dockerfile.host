@@ -1,23 +1,61 @@
+# # ---- Etapa de Build ----
+# FROM golang:1.23.11 AS builder
+
+# # Define o diretório de trabalho raiz
+# WORKDIR /app
+
+# # Copiando diretorios
+# COPY cmd/ ./cmd
+# COPY api/ ./api
+# COPY src/ ./src
+# COPY ws ./ws
+# COPY utils ./utils
+# COPY private ./private
+
+# # Define o diretório onde está o `go.mod` e o `main.go`
+# WORKDIR /app/cmd
+
+# # Baixa as dependências
+# RUN go mod download
+
+# # Cria a pasta bin para armazenar o executável
+# RUN mkdir -p /app/bin
+
+# # Compila o projeto e salva o binário em /app/bin
+# RUN go build -o /app/bin .
+
+# ---- Etapa Final (Imagem Leve) ----
+# FROM debian:bookworm-slim
+
+# # Instala certificados necessários
+# RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# # Define o diretório de trabalho no container final
+# WORKDIR /app
+
+# # Copia a pasta private (se necessário para execução)
+# COPY --from=builder /app/private ./private/
+# # Copia o binário gerado na etapa de build
+# COPY --from=builder /app/bin .
+
+# # Comando de inicialização
+# CMD ["/app/main"]
+
 # ---- Etapa de Build ----
 FROM golang:1.23.11 AS builder
 
 # Define o diretório de trabalho raiz
 WORKDIR /app
 
-# Copia a pasta `api`
+# Copiando diretorios
+COPY cmd/ ./cmd
 COPY api/ ./api
-
-# Copia a pasta `src`
 COPY src/ ./src
+COPY ws/ ./ws
+COPY utils/ ./utils
+COPY private/ ./private
 
-# Copia a pasta `ws`
-COPY ws ./ws
-
-# Copia a pasta `utils`
-COPY utils ./utils
-
-# Define o diretório onde está o `go.mod` e o `main.go`
-WORKDIR /app/api/main
+WORKDIR /app/cmd
 
 # Baixa as dependências
 RUN go mod download
@@ -37,8 +75,10 @@ RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/
 # Define o diretório de trabalho no container final
 WORKDIR /app
 
+# Copia a pasta private (se necessário para execução)
+COPY --from=builder /app/private ./private/
 # Copia o binário gerado na etapa de build
 COPY --from=builder /app/bin/main .
 
 # Comando de inicialização
-CMD ["/app/main"]
+CMD ["./main"]

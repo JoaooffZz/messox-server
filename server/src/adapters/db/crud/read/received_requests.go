@@ -1,8 +1,8 @@
 package read
 
 import (
-	m "db/models"
 	"fmt"
+	m "ports/db"
 )
 
 func (r *Read)GetReceivedRequests(addresseeID int) ([]m.ViewUser, error){

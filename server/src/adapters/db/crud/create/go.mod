@@ -2,6 +2,9 @@ module crud/create
 
 go 1.22.1
 
-replace db/models => ../../models
+replace ports/db => ../../../../ports/db
 
-require db/models v0.0.0-00010101000000-000000000000
+require (
+	github.com/lib/pq v1.10.9
+	ports/db v0.0.0-00010101000000-000000000000
+)

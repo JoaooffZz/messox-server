@@ -1,8 +1,8 @@
 package create
 
 import (
-	m "db/models"
 	"fmt"
+	m "ports/db"
 )
 
 func (c *Create)NewHistoryChat(chat m.ChatData) error {

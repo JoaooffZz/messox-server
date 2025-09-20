@@ -1,12 +1,15 @@
 package db
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type User struct {
     ID       int    `db:"id" json:"id"`
     Name     string `db:"name" json:"name"`
     Password string `db:"password" json:"password"`
-    Profile  string `db:"profile" json:"profile"`
+    Profile  []byte `db:"profile" json:"profile"`
     Bio      string `db:"bio" json:"bio"`
 }
 
@@ -21,6 +24,16 @@ type InboxMessage struct {
     AddresseeID int       `db:"addressee_id" json:"addressee_id"`
     Message     string    `db:"message" json:"message"`
     CreatedAt   time.Time `db:"created_at" json:"created_at"`
+}
+func (m InboxMessage) MarshalJSON() ([]byte, error) {
+    type Alias InboxMessage // cria um tipo auxiliar para evitar recursão
+    return json.Marshal(&struct {
+        CreatedAt string `json:"created_at"` // campo customizado
+        *Alias
+    }{
+        CreatedAt: m.CreatedAt.Format("15:04"), // formata só hora:minuto
+        Alias:     (*Alias)(&m),                // copia todos os outros campos
+    })
 }
 
 type ChatData struct {

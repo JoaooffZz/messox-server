@@ -1,8 +1,8 @@
 package create
 
 import (
-	m "db/models"
 	"fmt"
+	m "ports/db"
 )
 
 func (c *Create)NewInboxMessage(inbox m.InboxMessage) error {
