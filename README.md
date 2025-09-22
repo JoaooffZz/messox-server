@@ -48,4 +48,5 @@ Projetado com uma **arquitetura monolítica modular**, o foco principal do proje
 - [ ] Integração com PostgreSQL
 - [ ] Rotas principais API
 
-
+## 📚 Docs
+[![Routes-API](https://img.shields.io/badge/Routes-API-green)](docs/api/routes.md)
