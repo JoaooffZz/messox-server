@@ -21,7 +21,7 @@ curl -L \
     "token": "string"
   }
 }
-```json
+```
 ```plaintext
    status-codes:
         (200) -> "sucess login!"
