@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL UNIQUE,
-    password VARCHAR(250) NOT NULL,
+    password VARCHAR(400) NOT NULL,
     profile BYTEA NOT NULL,
     bio TEXT NOT NULL DEFAULT ''
 );

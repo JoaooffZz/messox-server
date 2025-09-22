@@ -1,9 +1,9 @@
 package models
 
 type WsEvent struct {
-	Sender *string `json:"sender,omitempty"`
-	Adderess string `json:"adderess"`
-	Date int64 `json:"date"`
-	ContentType string `json:"content_type"`
+	Sender *int `json:"sender,omitempty"`
+	Adderess *int `json:"adderess"`
+	Date string `json:"date"`
+	Type string `json:"type"`
 	Data string `json:"data"` 
 } 

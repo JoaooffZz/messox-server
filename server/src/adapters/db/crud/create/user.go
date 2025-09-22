@@ -5,7 +5,7 @@ import (
 	"os"
 	ports "ports/db"
 
-	"github.com/lib/pq"
+	"github.com/jackc/pgconn"
 )
 
 func (c *Create)NewUser(name string, password string)(*ports.User, error){
@@ -41,10 +41,12 @@ func (c *Create)NewUser(name string, password string)(*ports.User, error){
 	var id int
 	err = tx.QueryRow(query, name, password, profile,).Scan(&id)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			if pqErr.Code == "23505" {
-				// 23505 = (unique_violation) in PostgreSQL
-				return nil, &ports.ValidationError{Field: "Name: "+name, Msg: "is already being used"}
+		if pgErr, ok := err.(*pgconn.PgError); ok {
+			if pgErr.Code == "23505" { // unique_violation
+				return nil, &ports.ValidationError{
+					Field: "Name: " + name,
+					Msg:   "is already being used",
+				}
 			}
 		}
 		return nil, err

@@ -1,28 +1,31 @@
-module server/ws
+module routes/server
 
 go 1.23.0
 
 toolchain go1.24.7
 
-replace ws/connection => ../../../../ws/connection
+replace server/ws => ./web_socket
 
-replace ws/models => ../../../../ws/models
+replace server/ping => ./ping
 
-replace ws/master => ../../../../ws/master
+replace ws/connection => ../../../ws/connection
 
-replace ports/db => ../../../../src/ports/db
+replace ws/models => ../../../ws/models
 
-replace middleware/jwt => ../../../middleware/jwt
+replace ws/master => ../../../ws/master
 
-replace middleware/headers => ../../../middleware/headers
+replace ports/db => ../../../src/ports/db
+
+replace middleware/jwt => ../../middleware/jwt
+
+replace middleware/headers => ../../middleware/headers
 
 require (
 	github.com/gin-gonic/gin v1.11.0
-	middleware/headers v0.0.0-00010101000000-000000000000
-	middleware/jwt v0.0.0-00010101000000-000000000000
 	ports/db v0.0.0-00010101000000-000000000000
+	server/ping v0.0.0-00010101000000-000000000000
+	server/ws v0.0.0-00010101000000-000000000000
 	ws/connection v0.0.0-00010101000000-000000000000
-	ws/master v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -59,5 +62,8 @@ require (
 	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
+	middleware/headers v0.0.0-00010101000000-000000000000 // indirect
+	middleware/jwt v0.0.0-00010101000000-000000000000 // indirect
+	ws/master v0.0.0-00010101000000-000000000000 // indirect
 	ws/models v0.0.0-00010101000000-000000000000 // indirect
 )

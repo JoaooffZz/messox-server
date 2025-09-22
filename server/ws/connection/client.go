@@ -3,7 +3,6 @@ package connection
 import (
 	"encoding/json"
 	"time"
-
 	m "ws/models"
 
 	"github.com/gorilla/websocket"
@@ -22,7 +21,7 @@ const (
 
 type Client struct {
    // identificador
-   Id string
+   ID int
 
    // A conexão web socket
    Conn *websocket.Conn
@@ -32,15 +31,6 @@ type Client struct {
 
    // Canal de mensagem
    Send chan []byte
-}
-
-func NewClient(conn *websocket.Conn, hub *Hub, id string) *Client {
-   return &Client{
-      Id: id,
-      Conn: conn,
-      Hub: hub,
-      Send: make(chan []byte, 256),
-   }
 }
 
 func (c *Client)ReadPump() {
@@ -67,7 +57,7 @@ func (c *Client)ReadPump() {
       if err != nil {
          return
       }
-      event.Sender = &c.Id
+      event.Sender = &c.ID
       c.Hub.Broadcast <- &event
    }
 }
@@ -97,4 +87,4 @@ func (c *Client)WritePump() {
             }
       }
    }
-}      
+}   

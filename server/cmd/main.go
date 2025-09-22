@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"os"
 	portsDB "ports/db"
+	rServer "routes/server"
 	rUser "routes/user"
 	utils "utils"
+	connWs "ws/connection"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +18,8 @@ type ConfigCMD struct {
 	EngGIN *gin.Engine
 	DB portsDB.DB
 	KeyPem *[]byte
+	Hub *connWs.Hub
+	ApiKey *string
 }
 
 func main() {
@@ -26,11 +30,21 @@ func main() {
 		return
 	}
 	fmt.Print("\ncmd sucess!\n")
+	// Hub roda em goroutine
+    go cmd.Hub.Run()
 
 	routesUser := rUser.New(cmd.EngGIN, cmd.DB, cmd.KeyPem)
 	routesUser.Login.Run()
+	routesUser.Register.Run()
 
-	cmd.EngGIN.Run(":8080")
+	routesServer := rServer.New(cmd.EngGIN, cmd.DB, cmd.KeyPem, cmd.ApiKey, cmd.Hub)
+	routesServer.Ping.Run()
+	routesServer.Ws.Run()
+
+	// Gin roda na main (bloqueante)
+	if err := cmd.EngGIN.Run(":8080"); err != nil {
+		panic(err)
+	}
 }
 
 func new() (*ConfigCMD, error) {
@@ -54,11 +68,15 @@ func new() (*ConfigCMD, error) {
 		fmt.Printf("\nerror get key: %v\n", err)
 		return nil, err
 	}
-
+    fmt.Print("\ninit hub\n")
+	
+	hub := connWs.NewHub()
 	return &ConfigCMD{
 		EngGIN: engGIN,
 		DB: adpDB,
 		KeyPem: &keyPem,
+		Hub: hub,
+		ApiKey: nil,
 	}, nil
 }
 

@@ -2,11 +2,12 @@ package connection
 
 import (
 	"encoding/json"
+	"fmt"
 	m "ws/models"
 )
 type Hub struct {
 	// Registered clients.
-	clients map[string]*Client
+	clients map[int]*Client
 
 	// Inbound messages from the clients.
 	Broadcast chan *m.WsEvent
@@ -23,30 +24,33 @@ func NewHub() *Hub {
 		Broadcast:  make(chan *m.WsEvent),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
-		clients:    make(map[string]*Client),
+		clients:    make(map[int]*Client),
 	}
 }
 
 func (h *Hub) Run() {
+	fmt.Println(">>> Entrou no Hub.Run()")
 	for {
+		fmt.Println(">>> Loop Hub...")
 		select {
 		    case client := <- h.Register:
-				h.clients[client.Id] = client
+				h.clients[client.ID] = client
 				
 			case client := <- h.Unregister:
-				if _, ok := h.clients[client.Id]; ok {
-					delete(h.clients, client.Id)
+				if _, ok := h.clients[client.ID]; ok {
+					delete(h.clients, client.ID)
 					close(client.Send)
 				}
 
 			case event := <- h.Broadcast:    
-				adderess, ok := h.clients[event.Adderess]
+				adderess, ok := h.clients[*event.Adderess]
 				if !ok {
-	                // chama a goroutine para salvar a mensagem no
-				    // banco de dados de notificação.
+	                // chama a goroutine para salvar o evento no
+				    // banco de dados de inbox.
 					return
 				}
-				msg, err :=json.Marshal(event)
+				event.Adderess = nil
+				msg, err := json.Marshal(event)
 				if err != nil {
 					// chama log
 					return

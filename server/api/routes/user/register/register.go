@@ -1,15 +1,16 @@
 package register
 
 import (
-	config "api/config"
 	"errors"
+	middHaders "middleware/headers"
+	middJwt "middleware/jwt"
 	"net/http"
-
-	middleware "middleware/jwt"
 	portsDB "ports/db"
+	utils "utils"
 
 	"github.com/gin-gonic/gin"
 )
+const (accept = "application/json")
 type Request struct {
 	Name string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -21,17 +22,22 @@ type Response struct {
 	Bio string `json:"bio" binding:"required"`
 }
 
-type UserRegister struct {
+type RouteRegister struct {
 	Eng *gin.Engine
 	DB portsDB.DB
 	KeyPem *[]byte
 }
 
-func (u *UserRegister)Run() {
-	u.Eng.POST("/user/register", func(ctx *gin.Context){
-		contentHeader := config.AuthHeader(ctx)
-		if (!contentHeader.IsAuth) {
-			ctx.JSON(http.StatusBadRequest, contentHeader.Header)
+func (r *RouteRegister)Run() {
+	r.Eng.POST("/user/register", func(ctx *gin.Context){
+		
+		headers := middHaders.HeaderAPI{Ctx: ctx}
+		_, hae := headers.AuthHTTP(accept)
+		if hae != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"header-field": hae.Field, 
+				"message": hae.Msg,
+			})
 			return
 		}
 
@@ -40,30 +46,30 @@ func (u *UserRegister)Run() {
 			ctx.JSON(http.StatusBadRequest, nil)
 			return
 		}
-       
-		user, err := u.DB.NewUser(req.Name, req.Password)
-		var ve *portsDB.ValidationError
-		if errors.As(err, &ve){
-			ctx.JSON(http.StatusConflict, gin.H{
-				"field": ve.Field,
-				"message": ve.Msg,
-			})
-			return
-		}
-		var sle *portsDB.StringLengthError
-		if errors.As(err, &sle){
-			ctx.JSON(http.StatusRequestEntityTooLarge, gin.H{
-				"field": sle.Field,
-				"message": "exceeded size",
-			})
-			return
-		}
+        pass := utils.Sha512String(req.Password)
+		user, err := r.DB.NewUser(req.Name, pass)
 		if err != nil {
+		    var ve *portsDB.ValidationError
+			if errors.As(err, &ve){
+				ctx.JSON(http.StatusConflict, gin.H{
+					"field": ve.Field,
+					"message": ve.Msg,
+				})
+				return
+			}
+			var sle *portsDB.StringLengthError
+			if errors.As(err, &sle){
+				ctx.JSON(http.StatusRequestEntityTooLarge, gin.H{
+					"field": sle.Field,
+					"message": "exceeded size",
+				})
+				return
+			}
 			ctx.JSON(http.StatusInternalServerError, nil)
 			return
 		}
 
-		jwt := middleware.MiddlewareJWT{KeyPem: *u.KeyPem}
+		jwt := middJwt.JWT{KeyPem: *r.KeyPem}
 		token, err := jwt.CreateToken(user.ID)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, nil)
@@ -71,7 +77,7 @@ func (u *UserRegister)Run() {
 		}
 		
 		ctx.JSON(http.StatusCreated, Response{
-			Token: token,
+			Token: *token,
 			Name: user.Name,
 			Profile: user.Profile,
 			Bio: user.Bio,

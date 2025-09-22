@@ -3,15 +3,15 @@ package login
 import (
 	"net/http"
 
-	config "api/config"
 	utils "utils"
 
-	middleware "middleware/jwt"
+	middHaders "middleware/headers"
+	middJwt "middleware/jwt"
 	portsDB "ports/db"
 
 	"github.com/gin-gonic/gin"
 )
-
+const (accept = "application/json")
 type Request struct {
 	Name string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -20,17 +20,22 @@ type Response struct {
 	Token string `json:"token" binding:"required"`
 }
 
-type UserLogin struct {
+type RouteLogin struct {
 	Eng *gin.Engine
 	DB portsDB.DB
 	KeyPem *[]byte
 }
 
-func (u *UserLogin)Run() {
-	u.Eng.POST("/user/login", func(ctx *gin.Context){
-		contentHeader := config.AuthHeader(ctx)
-		if (!contentHeader.IsAuth) {
-			ctx.JSON(http.StatusBadRequest, contentHeader.Header)
+func (r *RouteLogin)Run() {
+	r.Eng.POST("/user/login", func(ctx *gin.Context){
+		
+		headers := middHaders.HeaderAPI{Ctx: ctx}
+		_, hae := headers.AuthHTTP(accept)
+		if hae != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"header-field": hae.Field, 
+				"message": hae.Msg,
+			})
 			return
 		}
 
@@ -47,7 +52,7 @@ func (u *UserLogin)Run() {
 
 		go func(name string, done chan bool, notFound chan bool, errChan chan error) {
 			var err error
-			user, err = u.DB.GetUser(name)
+			user, err = r.DB.GetUser(name)
 			if err != nil {
 				errChan <- err
 				return
@@ -69,14 +74,14 @@ func (u *UserLogin)Run() {
 						return
 					}
 
-					jwt := middleware.MiddlewareJWT{KeyPem: *u.KeyPem}
+					jwt := middJwt.JWT{KeyPem: *r.KeyPem}
 					token, err := jwt.CreateToken(user.ID)
 					if err != nil {
 						ctx.JSON(http.StatusInternalServerError, nil)
 						return
 					}
 
-					ctx.JSON(http.StatusOK, Response{Token: token})
+					ctx.JSON(http.StatusOK, Response{Token: *token})
 					return
 				}
 
