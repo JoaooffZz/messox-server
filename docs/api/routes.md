@@ -11,15 +11,17 @@ curl -L \
   -H "Authorization: Bearer <NONE-TOKEN>" \
   https://api:8080/user/login
 ```
-+ request-body -J \
-+ {
-+   "name": "string",
-+   "password": "string"
-+ }
-+ response-body -J \
-+ {
-+   "token": "string",
-+ }
+```json
+{
+  "request-body": {
+    "name": "string",
+    "password": "string"
+  },
+  "response-body": {
+    "token": "string"
+  }
+}
+```json
 ```plaintext
    status-codes:
         (200) -> "sucess login!"
@@ -29,6 +31,8 @@ curl -L \
         (500) -> "internal error"
 ```
 
+
+
 ```diff
 (POST) /user/register
 ```
@@ -37,19 +41,23 @@ curl -L \
   -H "Accept: application/json" \
   -H "Authorization: Bearer <NONE-TOKEN>" \
   https://api:8080/user/register
+
 ```
-+ request-body -J \
-+ {
-+   "name": "string",
-+   "password": "string"
-+ }
-+ response-body -J \
-+ {
-+   "token": "string",
-+   "name": "string",
-+   "profile": "bytes",
-+   "bio": "string"
-+ }
+```json
+{
+  "request-body": {
+    "name": "string",
+    "password": "string"
+  },
+
+  "response-body": {
+    "token": "string",
+    "name": "string",
+    "profile": "bytes",
+    "bio": "string"
+  }
+}
+```
 ```plaintext
    status-codes:
         (201) -> "created user"
@@ -78,6 +86,8 @@ curl -L \
         (400) -> "headers or request-body invalid"
         (401) -> "not authorized, api key is necessary"
 ```
+
+
 
 ```diff
 (GET) /server/ws
