@@ -1,35 +1,44 @@
 package ping
 
 import (
-	middHaders "middleware/headers"
+	"fmt"
+	middHeaders "middleware/headers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-const (accept = "*/*")
+const (
+	accept = "*/*"
+)
+
 // If you want to make your server accessible to everyone,
 // Just pass api key as nil.
 type RoutePing struct {
-	Eng *gin.Engine
+	Eng    *gin.Engine
 	ApiKey *string
 }
-func (r *RoutePing)Run() {
-	r.Eng.GET("/ping", func(ctx *gin.Context){
 
-		headers := middHaders.HeaderAPI{Ctx: ctx}
+func (r *RoutePing) Run() {
+	r.Eng.GET("server/ping", func(ctx *gin.Context) {
+
+		headers := middHeaders.HeaderAPI{Ctx: ctx}
 		token, hae := headers.AuthHTTP(accept)
 		if hae != nil {
+			fmt.Printf("ERROR IS: %s", hae.Error())
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"header-field": hae.Field, 
-				"message": hae.Msg,
+				"header-field": hae.Field,
+				"message":      hae.Msg,
 			})
 			return
 		}
 
-		if (token != r.ApiKey) {
-			ctx.JSON(http.StatusUnauthorized, nil)
-			return 
+		if r.ApiKey != nil {
+			fmt.Println(*token)
+			if *token != *r.ApiKey {
+				ctx.JSON(http.StatusUnauthorized, nil)
+				return
+			}
 		}
 
 		ctx.JSON(http.StatusOK, nil)

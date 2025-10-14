@@ -22,16 +22,20 @@ func (h *HeaderAPIError) Error() string {
 
 func (h *HeaderAPI) AuthHTTP(expectedAccept string) (*string, *HeaderAPIError) {
 	acceptHeader := h.Ctx.GetHeader("Accept")
+
+	// if expectedAccept != "*/*" {
 	if acceptHeader != expectedAccept {
 		return nil, &HeaderAPIError{Field: "Accept", Msg: "malformed"}
 	}
-
+	// }
 	authHeader := h.Ctx.GetHeader("Authorization")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
+	fmt.Printf("HEADER AUTH: %s", authHeader)
+	if !strings.HasPrefix(authHeader, "Bearer") {
 		return nil, &HeaderAPIError{Field: "Authorization", Msg: "missing (token)"}
 	}
 
-	token := strings.TrimPrefix(authHeader, "Bearer ")
+	tokenPrefix := strings.TrimPrefix(authHeader, "Bearer")
+	token := strings.ReplaceAll(tokenPrefix, " ", "")
 
 	return &token, nil
 }
@@ -48,11 +52,12 @@ func (h *HeaderAPI) AuthWs() (*string, *HeaderAPIError) {
 	}
 
 	authHeader := h.Ctx.GetHeader("Authorization")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
+	if !strings.HasPrefix(authHeader, "Bearer") {
 		return nil, &HeaderAPIError{Field: "Authorization", Msg: "missing (token)"}
 	}
 
-	token := strings.TrimPrefix(authHeader, "Bearer ")
+	token := strings.TrimPrefix(authHeader, "Bearer")
+	token = strings.ReplaceAll(token, " ", "")
 
 	return &token, nil
 }
