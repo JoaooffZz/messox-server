@@ -1,10 +1,7 @@
-# tests
 /test/
-
-# docker tests
 .dockerfile.test
-.docker-compose.test.yml
 
-# host docker
-.docker-compose-host.yml
+docker-compose*
+services/dockerfile*
 
+.DS_Store
